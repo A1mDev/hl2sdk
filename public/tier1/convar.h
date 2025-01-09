@@ -20,6 +20,7 @@
 #include "tier1/iconvar.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlstring.h"
+#include "Color.h"
 #include "icvar.h"
 
 #ifdef _WIN32
@@ -122,8 +123,8 @@ public:
 	virtual void				AddFlags( int flags );
 	// Clear flag
 	virtual void				RemoveFlags( int flags );
-
-	virtual int					GetFlags() const;
+	// Get flags
+	virtual int					GetFlags( void ) const;
 
 	// Return name of cvar
 	virtual const char			*GetName( void ) const;
@@ -181,6 +182,11 @@ protected:
 
 	// ConVars in this executable use this 'global' to access values.
 	static IConCommandBaseAccessor	*s_pAccessor;
+public:
+	inline void SetFlags(int flags)	
+	{ 
+		m_nFlags = flags; 
+	}
 };
 
 
@@ -318,6 +324,11 @@ private:
 	bool m_bHasCompletionCallback : 1;
 	bool m_bUsingNewCommandCallback : 1;
 	bool m_bUsingCommandCallbackInterface : 1;
+public:
+	inline FnCommandCallback_t GetCallback() const
+	{ 
+		return m_fnCommandCallback; 
+	}
 };
 
 
@@ -363,6 +374,7 @@ public:
 	FORCEINLINE_CVAR int			GetInt( void ) const;
 	FORCEINLINE_CVAR bool			GetBool() const {  return !!GetInt(); }
 	FORCEINLINE_CVAR char const	   *GetString( void ) const;
+	FORCEINLINE_CVAR Color			GetColor ( void ) const;
 	
 	// Used internally by OneTimeInit to initialize.
 	virtual void				Init();
@@ -377,6 +389,7 @@ public:
 	virtual void				SetValue( const char *value );
 	virtual void				SetValue( float value );
 	virtual void				SetValue( int value );
+	virtual void				SetValue( Color value );
 	
 	// Reset to default value
 	void						Revert( void );
@@ -392,6 +405,7 @@ private:
 	// For CVARs marked FCVAR_NEVER_AS_STRING
 	virtual void				InternalSetFloatValue( float fNewValue );
 	virtual void				InternalSetIntValue( int nValue );
+	virtual void				InternalSetColorValue( Color cValue );
 
 	virtual bool				ClampValue( float& value );
 	virtual void				ChangeStringValue( const char *tempVal, float flOldValue );
@@ -427,6 +441,21 @@ private:
 	
 	// Call this function when ConVar changes
 	FnChangeCallback_t			m_fnChangeCallback;
+public:
+	inline FnChangeCallback_t GetCallback() const
+	{
+		return m_fnChangeCallback;
+	}
+	inline void SetMin(bool set, float min=0.0)
+	{ 
+		m_bHasMin = set; 
+		m_fMinVal = min; 
+	}
+	inline void SetMax(bool set, float max=0.0)
+	{
+		m_bHasMax = set;
+		m_fMaxVal = max; 
+	}
 };
 
 
@@ -461,6 +490,18 @@ FORCEINLINE_CVAR const char *ConVar::GetString( void ) const
 	return ( m_pParent->m_pszString ) ? m_pParent->m_pszString : "";
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Return ConVar value as a Color
+// Output : int
+//-----------------------------------------------------------------------------
+FORCEINLINE_CVAR Color ConVar::GetColor( void ) const 
+{
+	Color color = Color();
+	color.SetRawColor(m_pParent->m_nValue);
+
+	return color;
+}
+
 
 //-----------------------------------------------------------------------------
 // Used to read/write convars that already exist (replaces the FindVar method)
@@ -482,11 +523,13 @@ public:
 	int GetInt( void ) const;
 	bool GetBool() const { return !!GetInt(); }
 	const char *GetString( void ) const;
+	Color GetColor( void ) const;
 
 	void SetValue( const char *pValue );
 	void SetValue( float flValue );
 	void SetValue( int nValue );
 	void SetValue( bool bValue );
+	void SetValue( Color cValue );
 
 	const char *GetName() const;
 
@@ -543,6 +586,16 @@ FORCEINLINE_CVAR const char *ConVarRef::GetString( void ) const
 	return m_pConVarState->m_pszString;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Return ConVar value as a Color
+//-----------------------------------------------------------------------------
+FORCEINLINE_CVAR Color ConVarRef::GetColor( void ) const
+{
+	Color color = Color();
+	color.SetRawColor(m_pConVarState->m_nValue);
+
+	return color;
+}
 
 FORCEINLINE_CVAR void ConVarRef::SetValue( const char *pValue )
 {
@@ -562,6 +615,11 @@ FORCEINLINE_CVAR void ConVarRef::SetValue( int nValue )
 FORCEINLINE_CVAR void ConVarRef::SetValue( bool bValue )
 {
 	m_pConVar->SetValue( bValue ? 1 : 0 );
+}
+
+FORCEINLINE_CVAR void ConVarRef::SetValue( Color cValue )
+{
+	m_pConVar->SetValue( cValue );
 }
 
 FORCEINLINE_CVAR const char *ConVarRef::GetDefault() const
