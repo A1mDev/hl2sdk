@@ -123,8 +123,8 @@ public:
 	virtual void				AddFlags( int flags );
 	// Clear flag
 	virtual void				RemoveFlags( int flags );
-
-	virtual int					GetFlags() const;
+	// Get flags
+	virtual int					GetFlags( void ) const;
 
 	// Return name of cvar
 	virtual const char			*GetName( void ) const;
@@ -182,6 +182,11 @@ protected:
 
 	// ConVars in this executable use this 'global' to access values.
 	static IConCommandBaseAccessor	*s_pAccessor;
+public:
+	inline void SetFlags(int flags)	
+	{ 
+		m_nFlags = flags; 
+	}
 };
 
 
@@ -319,6 +324,11 @@ private:
 	bool m_bHasCompletionCallback : 1;
 	bool m_bUsingNewCommandCallback : 1;
 	bool m_bUsingCommandCallbackInterface : 1;
+public:
+	inline FnCommandCallback_t GetCallback() const
+	{ 
+		return m_fnCommandCallback; 
+	}
 };
 
 
@@ -431,6 +441,21 @@ private:
 	
 	// Call this function when ConVar changes
 	FnChangeCallback_t			m_fnChangeCallback;
+public:
+	inline FnChangeCallback_t GetCallback() const
+	{
+		return m_fnChangeCallback;
+	}
+	inline void SetMin(bool set, float min=0.0)
+	{ 
+		m_bHasMin = set; 
+		m_fMinVal = min; 
+	}
+	inline void SetMax(bool set, float max=0.0)
+	{
+		m_bHasMax = set;
+		m_fMaxVal = max; 
+	}
 };
 
 
