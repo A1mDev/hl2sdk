@@ -123,8 +123,8 @@ public:
 	virtual void				AddFlags( int flags );
 	// Clear flag
 	virtual void				RemoveFlags( int flags );
-
-	virtual int					GetFlags() const;
+	// Get flags
+	virtual int					GetFlags( void ) const;
 
 	// Return name of cvar
 	virtual const char			*GetName( void ) const;
@@ -157,7 +157,7 @@ protected:
 	// Internal copy routine ( uses new operator from correct module )
 	char						*CopyString( const char *from );
 
-private:
+protected:
 	// Next ConVar in chain
 	// Prior to register, it points to the next convar in the DLL.
 	// Once registered, though, m_pNext is reset to point to the next
@@ -293,7 +293,7 @@ public:
 	// Invoke the function
 	virtual void Dispatch( const CCommand &command );
 
-private:
+protected:
 	// NOTE: To maintain backward compat, we have to be very careful:
 	// All public virtual methods must appear in the same order always
 	// since engine code will be calling into this code, which *does not match*
@@ -404,7 +404,7 @@ private:
 									const char *pHelpString = 0, bool bMin = false, float fMin = 0.0,
 									bool bMax = false, float fMax = false, FnChangeCallback_t callback = 0 );
 
-private:
+protected:
 
 	// This either points to "this" or it points to the original declaration of a ConVar.
 	// This allows ConVars to exist in separate modules, and they all use the first one to be declared.
