@@ -661,7 +661,7 @@ public:
 
 };
 
-#define CLIENT_DLL_INTERFACE_VERSION		"VClient016"
+#define CLIENT_DLL_INTERFACE_VERSION		"VClient015"
 
 //-----------------------------------------------------------------------------
 // Purpose: Interface exposed from the client .dll back to the engine for specifying shared .dll IAppSystems (e.g., ISoundEmitterSystem)
