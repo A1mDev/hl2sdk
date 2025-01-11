@@ -157,7 +157,7 @@ protected:
 	// Internal copy routine ( uses new operator from correct module )
 	char						*CopyString( const char *from );
 
-private:
+protected:
 	// Next ConVar in chain
 	// Prior to register, it points to the next convar in the DLL.
 	// Once registered, though, m_pNext is reset to point to the next
@@ -182,11 +182,6 @@ protected:
 
 	// ConVars in this executable use this 'global' to access values.
 	static IConCommandBaseAccessor	*s_pAccessor;
-public:
-	inline void SetFlags(int flags)	
-	{ 
-		m_nFlags = flags; 
-	}
 };
 
 
@@ -298,7 +293,7 @@ public:
 	// Invoke the function
 	virtual void Dispatch( const CCommand &command );
 
-private:
+protected:
 	// NOTE: To maintain backward compat, we have to be very careful:
 	// All public virtual methods must appear in the same order always
 	// since engine code will be calling into this code, which *does not match*
@@ -324,11 +319,6 @@ private:
 	bool m_bHasCompletionCallback : 1;
 	bool m_bUsingNewCommandCallback : 1;
 	bool m_bUsingCommandCallbackInterface : 1;
-public:
-	inline FnCommandCallback_t GetCallback() const
-	{ 
-		return m_fnCommandCallback; 
-	}
 };
 
 
@@ -414,7 +404,7 @@ private:
 									const char *pHelpString = 0, bool bMin = false, float fMin = 0.0,
 									bool bMax = false, float fMax = false, FnChangeCallback_t callback = 0 );
 
-private:
+protected:
 
 	// This either points to "this" or it points to the original declaration of a ConVar.
 	// This allows ConVars to exist in separate modules, and they all use the first one to be declared.
@@ -441,21 +431,6 @@ private:
 	
 	// Call this function when ConVar changes
 	FnChangeCallback_t			m_fnChangeCallback;
-public:
-	inline FnChangeCallback_t GetCallback() const
-	{
-		return m_fnChangeCallback;
-	}
-	inline void SetMin(bool set, float min=0.0)
-	{ 
-		m_bHasMin = set; 
-		m_fMinVal = min; 
-	}
-	inline void SetMax(bool set, float max=0.0)
-	{
-		m_bHasMax = set;
-		m_fMaxVal = max; 
-	}
 };
 
 
