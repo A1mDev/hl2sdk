@@ -41,12 +41,15 @@ public:
 	Vector m_vStart;
 	Vector m_vNormal;
 	QAngle m_vAngles;
+	
 	int		m_fFlags;
+	
 #ifdef CLIENT_DLL
 	ClientEntityHandle_t m_hEntity;
 #else
 	int		m_nEntIndex;
 #endif
+
 	float	m_flScale;
 	float	m_flMagnitude;
 	float	m_flRadius;
@@ -59,7 +62,9 @@ public:
 	int		m_nHitBox;
 	
 	unsigned char	m_nColor;
-
+	
+	bool	m_bPositionsAreRelativeToEntity;
+	
 // Don't mess with stuff below here. DispatchEffect handles all of this.
 public:
 	CEffectData()
@@ -70,11 +75,13 @@ public:
 		m_vAngles.Init();
 
 		m_fFlags = 0;
+		
 #ifdef CLIENT_DLL
 		m_hEntity = INVALID_EHANDLE_INDEX;
 #else
 		m_nEntIndex = 0;
 #endif
+
 		m_flScale = 1.f;
 		m_nAttachmentIndex = 0;
 		m_nSurfaceProp = 0;
@@ -87,6 +94,7 @@ public:
 		m_nHitBox = 0;
 
 		m_nColor = 0;
+		m_bPositionsAreRelativeToEntity = false;
 	}
 
 	int GetEffectNameIndex() { return m_iEffectName; }
