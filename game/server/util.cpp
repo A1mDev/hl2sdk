@@ -749,7 +749,7 @@ static unsigned short FixedUnsigned16( float value, float scale )
 //-----------------------------------------------------------------------------
 // Compute shake amplitude
 //-----------------------------------------------------------------------------
-inline float ComputeShakeAmplitude( const Vector &center, const Vector &shakePt, float amplitude, float radius ) 
+inline float ComputeShakeAmplitude( const Vector &center, const Vector &shakePt, float amplitude, float radius )
 {
 	if ( radius <= 0 )
 		return amplitude;
@@ -810,7 +810,7 @@ inline void TransmitShakeEvent( CBasePlayer *pPlayer, float localAmplitude, floa
 //			bAirShake - if this is false, then it will only shake players standing on the ground.
 //-----------------------------------------------------------------------------
 const float MAX_SHAKE_AMPLITUDE = 16.0f;
-void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, float duration, float radius, ShakeCommand_t eCommand, bool bAirShake )
+void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, float duration, float radius, ShakeCommand_t eCommand, bool bAirShake, CUtlVector<CBasePlayer *> *ignore )
 {
 	int			i;
 	float		localAmplitude;
@@ -822,15 +822,24 @@ void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, f
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
-
-		//
-		// Only start shakes for players that are on the ground unless doing an air shake.
-		//
-		if ( !pPlayer || (!bAirShake && (eCommand == SHAKE_START) && !(pPlayer->GetFlags() & FL_ONGROUND)) )
+		if ( !pPlayer )
 		{
 			continue;
 		}
-
+		
+		//
+		// Only start shakes for players that are on the ground unless doing an air shake.
+		//
+		if ( !bAirShake && (eCommand == SHAKE_START) && !(pPlayer->GetFlags() & FL_ONGROUND) )
+		{
+			continue;
+		}
+		
+		if ( ignore != NULL && ignore->HasElement( pPlayer ) )
+		{
+			continue;
+		}
+		
 		localAmplitude = ComputeShakeAmplitude( center, pPlayer->WorldSpaceCenter(), amplitude, radius );
 
 		// This happens if the player is outside the radius, in which case we should ignore 
