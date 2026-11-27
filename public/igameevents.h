@@ -12,11 +12,14 @@
 //=============================================================================//
 #if !defined( IGAMEEVENTS_H )
 #define IGAMEEVENTS_H
+
+// Temporarily disable the Windows CreateEvent macro to avoid conflicts with the interface method.
+#pragma push_macro("CreateEvent")
+#undef CreateEvent
+
 #ifdef _WIN32
 #pragma once
 #endif
-
-#include "tier1/interface.h"
 
 #define INTERFACEVERSION_GAMEEVENTSMANAGER	"GAMEEVENTSMANAGER001"	// old game event manager, don't use it!
 #define INTERFACEVERSION_GAMEEVENTSMANAGER2	"GAMEEVENTSMANAGER002"	// new game event manager,
@@ -124,7 +127,13 @@ public:
 	// create an event by name, but doesn't fire it. returns NULL is event is not
 	// known or no listener is registered for it. bForce forces the creation even if no listener is active
 	virtual IGameEvent *CreateEvent( const char *name, bool bForce = false, int *pCookie = NULL ) = 0;
-
+	
+	// Wrapper for CreateEvent to avoid Windows macro conflicts.
+	IGameEvent* CreateGameEvent( const char* name, bool bForce = false, int* pCookie = NULL )
+	{
+		return CreateEvent( name, bForce, pCookie );
+	}
+	
 	// fires a server event created earlier, if bDontBroadcast is set, event is not send to clients
 	virtual bool FireEvent( IGameEvent *event, bool bDontBroadcast = false ) = 0;
 
@@ -193,7 +202,6 @@ public:
 	virtual KeyValues *UnserializeKeyValue( bf_read *msg ) = 0; // create new KeyValues, must be deleted
 };
 
-
-
+#pragma pop_macro("CreateEvent")
 
 #endif // IGAMEEVENTS_H
